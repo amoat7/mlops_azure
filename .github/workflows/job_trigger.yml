@@ -1,0 +1,36 @@
+name: Train Job on production
+on:
+  push:
+    branches:
+      - master
+jobs:
+  train_dev:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@main
+    - name: Install az ml extension
+      run: az extension add -n ml -y 
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: submit and run training job
+      run: az ml job create --file src/job.yml --set inputs.training_data.path=${{secrets.DATA}} --resource-group azureml --workspace-name azureml --stream
+  
+  train_prod:
+    needs: train_dev
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@main
+    - name: Install az ml extension
+      run: az extension add -n ml -y 
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: submit and run training job
+      run: az ml job create --file src/job.yml --set inputs.training_data.path=${{secrets.DATA}} --resource-group azureml --workspace-name azureml --stream
