@@ -12,7 +12,7 @@ jobs:
         python -m pip install pylint
     - name: Run linting tests
       run: |
-        pylint --disable=R,C,W1203 src/model 
+        pylint --disable=R,C,W1203 src/model/ 
   
   testing:
     runs-on: ubuntu-latest
